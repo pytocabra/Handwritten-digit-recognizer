@@ -17,11 +17,12 @@ class Pixel:
         self.neighbors = []
 
     def draw_pixel(self, window):
+        # draw pixel as square 
         pixel = pygame.Rect(self.x, self.y, self.size, self.size)
         pygame.draw.rect(window, self.color, pixel, 0)
-        #pygame.draw.rect(window, (0,0,0), pixel, 1)
 
     def get_neighbors(self):
+        # check wheater pixel has neighbors or not
         self.neighbors = []
         # left neighbor
         if self.x - self.size >= 0:
@@ -37,6 +38,7 @@ class Pixel:
             self.neighbors.append('up')
         return self.neighbors
     
+
 class Window:
     def __init__(self, width=280, height=280):
         self.width = width
@@ -50,6 +52,7 @@ class Window:
         self.generate_pixels()
 
     def generate_pixels(self):
+        # generate grid 28x28 pixels 
         self.grid = []
         for row in range(self.rows):
             row_grid = []
@@ -60,12 +63,14 @@ class Window:
             self.grid.append(row_grid)
 
     def draw_grid(self):
+        # draw grid in window
         for row in range(self.rows):
             for col in range(self.cols):
                 pix = self.grid[row][col]
                 pix.draw_pixel(self.window)
 
     def draw_pixel_neighbours(self, row, col):
+        # draw pixel and its neighbours on black
         self.grid[row][col].color = BLACK
         neighbors = self.grid[row][col].get_neighbors()
         if 'left' in neighbors:
@@ -78,6 +83,7 @@ class Window:
             self.grid[row][col-1].color = BLACK
 
     def target_pixel(self, position):
+        # get pixel position and draw it
         x_pos, y_pos = position
         for row in range(self.rows):
             for col in range(self.cols):
@@ -89,6 +95,7 @@ class Window:
                         self.draw_pixel_neighbours(row, col)
 
     def get_image(self):
+        # get image from the screen to array
         array = []
         for row in range(self.rows):
             line = []
@@ -108,12 +115,14 @@ class Window:
         return x_test[:1]
 
     def popup_message(self, prediction):
+        # predition popup message
         root = tkinter.Tk()
         root.withdraw()
         messagebox.showinfo('Prediction', f'This number is a: {prediction}')
 
 
     def predict(self, image):
+        # guess drew digit from the screen
         model = tf.keras.models.load_model('saved_model/')
         predictions = model.predict(image)
         prediction = np.argmax(predictions[0])
@@ -122,6 +131,7 @@ class Window:
 
 
     def event_handler(self, event):
+        # handel all events 
         if pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             self.target_pixel(pos)
@@ -135,10 +145,10 @@ class Window:
             self.running = False
 
     def run(self):
+        # main run function
         while self.running:
             for event in pygame.event.get():
                 self.event_handler(event)
-
             self.draw_grid()
             pygame.display.update()
         pygame.quit()
